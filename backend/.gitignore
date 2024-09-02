@@ -1,0 +1,8 @@
+# air
+/tmp
+
+# production
+/main
+
+# local env files
+.env*.local

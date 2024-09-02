@@ -1,0 +1,25 @@
+services:
+  postgres:
+    extends:
+      file: docker-compose.yml
+      service: postgres
+    ports:
+      - 5432:5432
+  redis:
+    extends:
+      file: docker-compose.yml
+      service: redis
+    ports:
+      - 6379:6379
+  minio:
+    extends:
+      file: docker-compose.yml
+      service: minio
+    ports:
+      - 9000:9000
+      - 9001:9001
+
+volumes:
+  postgres-data:
+  redis-data:
+  minio-data:
