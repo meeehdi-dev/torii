@@ -26,10 +26,6 @@ client.on("end", () => {
 });
 client.connect();
 
-// TODO: replace with Redis
-/** @type {Map<string, any>} */
-const cache = new Map();
-
 export default class RedisCacheHandler {
   /** @type {import("next/dist/server/lib/incremental-cache").CacheHandlerContext} */
   options;
@@ -45,19 +41,17 @@ export default class RedisCacheHandler {
    * @returns {Promise<import("next/dist/server/lib/incremental-cache").CacheHandlerValue | null>}
    */
   async get(cacheKey) {
-    console.log("get cache", cacheKey);
-    return cache.get(`nextjs_${cacheKey}`);
+    return client.get(`nextjs_${cacheKey}`);
   }
 
   /**
    * @param {string} pathname
    * @param {import("next/dist/server/response-cache").IncrementalCacheValue} data
-   * @param {{tags: string[]}} ctx
+   * @param {{tags: string[], revalidate: number | false}} ctx
    * @return {Promise<void>}
    */
   async set(pathname, data, ctx) {
-    console.log("set cache", pathname);
-    cache.set(`nextjs_${pathname}`, {
+    client.set(`nextjs_${pathname}`, {
       value: data,
       lastModified: Date.now(),
       tags: ctx.tags,
@@ -69,16 +63,17 @@ export default class RedisCacheHandler {
    * @return {Promise<void>}
    */
   async revalidateTag(tags) {
+    console.error("tag revalidate not implemented!");
     if (!Array.isArray(tags)) {
       tags = [tags];
     }
-    for (let tag of tags) {
-      const entries = Object.entries(cache);
-      for (let [key, value] of entries) {
-        if (value.tags.includes(tag)) {
-          cache.delete(key);
-        }
-      }
-    }
+    // for (let tag of tags) {
+    //   const entries = Object.entries(cache);
+    //   for (let [key, value] of entries) {
+    //     if (value.tags.includes(tag)) {
+    //       cache.delete(key);
+    //     }
+    //   }
+    // }
   }
 }
