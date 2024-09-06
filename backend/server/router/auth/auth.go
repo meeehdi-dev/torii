@@ -23,7 +23,7 @@ func HasSession() gin.HandlerFunc {
 			return
 		}
 
-		err = cache.Client.Get(context.Background(), uuid).Err()
+		err = cache.Client.Get(context.Background(), "session_"+uuid).Err()
 		if err != nil {
 			log.Print(err)
 			c.JSON(403, gin.H{"error": "forbidden"})
@@ -55,7 +55,7 @@ func Login(c *gin.Context) {
 
 	sessionUuid := uuid.NewString()
 
-	err = cache.Client.Set(context.Background(), sessionUuid, user.ID, time.Hour).Err()
+	err = cache.Client.Set(context.Background(), "session_"+sessionUuid, user.ID, time.Hour).Err()
 	if err != nil {
 		c.JSON(500, gin.H{"success": false})
 		return
