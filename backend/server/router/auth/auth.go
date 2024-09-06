@@ -14,7 +14,6 @@ import (
 
 func HasSession() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		log.Print("YO???")
 		uuid, err := c.Cookie("session")
 		if err != nil {
 			log.Println(err)
@@ -50,8 +49,6 @@ func Login(c *gin.Context) {
 		})
 		return
 	}
-
-	uuid.NewString()
 
 	sessionUuid := uuid.NewString()
 
