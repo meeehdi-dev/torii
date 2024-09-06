@@ -19,8 +19,9 @@ export const Users: FC = async () => {
     fetchApi<{ users: { id: number; email: string }[] }>("/v1/users", {
       next: { revalidate: 60 },
     }),
-    fetchApi<{ user: { id: number; email: string } }>("/v2/user/1", {
+    fetchApi<{ user: { id: number; email: string } }>("/v1/user/1", {
       next: { revalidate: 60 },
+      credentials: "include",
     }),
   ]);
 

@@ -8,14 +8,18 @@ import (
 )
 
 type User struct {
-	ID    int `json:"id"`
+	ID    int    `json:"id"`
 	Email string `json:"email"`
 }
 
 func Get(c *gin.Context) {
 	rows, err := database.Db.Query("SELECT id, email FROM \"user\"")
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
+		c.JSON(500, gin.H{
+			"error": err,
+		})
+		return
 	}
 
 	users := []User{}
@@ -23,7 +27,11 @@ func Get(c *gin.Context) {
 		var user User
 		err := rows.Scan(&user.ID, &user.Email)
 		if err != nil {
-			log.Fatal(err)
+			log.Print(err)
+			c.JSON(500, gin.H{
+				"error": err,
+			})
+			return
 		}
 
 		users = append(users, user)
@@ -40,7 +48,11 @@ func GetOne(c *gin.Context) {
 	user := User{}
 	err := row.Scan(&user.ID, &user.Email)
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
+		c.JSON(500, gin.H{
+			"error": err,
+		})
+		return
 	}
 
 	c.JSON(200, gin.H{

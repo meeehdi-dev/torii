@@ -1,6 +1,7 @@
 package router
 
 import (
+	"main/server/router/auth"
 	"main/server/router/files"
 	"main/server/router/ping"
 	"main/server/router/users"
@@ -15,12 +16,10 @@ func Init() *gin.Engine {
 
 	v1 := r.Group("/v1")
 	{
+		v1.POST("/login", auth.Login)
 		v1.GET("/users", users.Get)
-	}
-
-	v2 := r.Group("/v2")
-	{
-		v2.GET("/user/:id", users.GetOne)
+		v1.Use(auth.HasSession())
+		v1.GET("/user/:id", users.GetOne)
 	}
 
 	v3 := r.Group("/v3")

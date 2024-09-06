@@ -32,8 +32,11 @@ func Init() {
 func ListBuckets(c *gin.Context) {
 	buckets, err := MinioClient.ListBuckets(context.Background())
 	if err != nil {
-		log.Print("bucket list err")
-    // TODO: return err?
+    log.Print(err)
+		c.JSON(500, gin.H{
+			"error": err,
+		})
+		return
 	}
 
 	c.JSON(200, gin.H{

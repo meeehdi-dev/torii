@@ -9,7 +9,7 @@ interface Bucket {
 export const Buckets: FC = async () => {
   const buckets = await fetchApi<{
     buckets: Bucket[];
-  }>("/v3/files/list");
+  }>("/v3/files/list", { next: { revalidate: 30 } });
 
   return (
     <div>

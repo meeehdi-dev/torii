@@ -5,6 +5,7 @@ import (
 	"main/server/database"
 	"main/server/router"
 	"main/server/router/files"
+	"os"
 
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
@@ -17,7 +18,7 @@ func main() {
 	database.Init()
 	files.Init()
 
-	err := r.Run()
+	err := r.Run("localhost:" + os.Getenv("PORT"))
 	if err != nil {
 		log.Fatal(err)
 	}
