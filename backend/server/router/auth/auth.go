@@ -1,23 +1,20 @@
 package auth
 
 import (
+	"context"
 	"log"
+	"main/server/cache"
 	"main/server/database"
 	"main/server/router/users"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
 
-type Session struct {
-	ID   int
-	uuid string
-}
-
-var Sessions = []Session{}
-
 func HasSession() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		log.Print("YO???")
 		uuid, err := c.Cookie("session")
 		if err != nil {
 			log.Println(err)
@@ -26,14 +23,9 @@ func HasSession() gin.HandlerFunc {
 			return
 		}
 
-		found := false
-		for _, session := range Sessions {
-			if session.uuid == uuid {
-				found = true
-			}
-		}
-
-		if !found {
+		err = cache.Client.Get(context.Background(), uuid).Err()
+		if err != nil {
+			log.Print(err)
 			c.JSON(403, gin.H{"error": "forbidden"})
 			c.Abort()
 			return
@@ -45,10 +37,8 @@ func HasSession() gin.HandlerFunc {
 
 // TODO: password encrypt (+ salt)
 // TODO: password check
-// TODO: Use redis to store sessions
 
 func Login(c *gin.Context) {
-	log.Println(c.PostForm("email"))
 	row := database.Db.QueryRow("SELECT id, email FROM \"user\" WHERE email = $1", c.PostForm("email"))
 
 	user := users.User{}
@@ -64,10 +54,12 @@ func Login(c *gin.Context) {
 	uuid.NewString()
 
 	sessionUuid := uuid.NewString()
-	Sessions = append(Sessions, Session{
-		ID:   user.ID,
-		uuid: sessionUuid,
-	})
+
+	err = cache.Client.Set(context.Background(), sessionUuid, user.ID, time.Hour).Err()
+	if err != nil {
+		c.JSON(500, gin.H{"success": false})
+		return
+	}
 
 	c.SetCookie("session", sessionUuid, 3600, "/", "localhost", false, false)
 
