@@ -12,24 +12,23 @@ import (
 	"github.com/google/uuid"
 )
 
+// TODO: handle expire via backend?
+var expireTime = time.Hour * 24 * 7 // 1 week
+
 func HasSession() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		uuid, err := c.Cookie("session")
-		if err != nil {
-			log.Println(err)
-			c.JSON(403, gin.H{"error": "forbidden"})
-			c.Abort()
-			return
-		}
+		uuid := c.GetHeader("x-uuid")
 
-		err = cache.Client.Get(context.Background(), "session_"+uuid).Err()
+		id, err := cache.Client.Get(context.Background(), "session_"+uuid).Result()
 		if err != nil {
 			log.Print(err)
 			c.JSON(403, gin.H{"error": "forbidden"})
 			c.Abort()
 			return
 		}
+		cache.Client.Expire(context.Background(), "session_"+uuid, expireTime)
 
+		c.Set("userId", id)
 		c.Next()
 	}
 }
@@ -52,15 +51,13 @@ func Login(c *gin.Context) {
 
 	sessionUuid := uuid.NewString()
 
-	err = cache.Client.Set(context.Background(), "session_"+sessionUuid, user.ID, time.Hour).Err()
+	err = cache.Client.Set(context.Background(), "session_"+sessionUuid, user.ID, expireTime).Err()
 	if err != nil {
 		c.JSON(500, gin.H{"success": false})
 		return
 	}
 
-	c.SetCookie("session", sessionUuid, 3600, "/", "localhost", false, false)
-
 	c.JSON(200, gin.H{
-		"success": true,
+		"uuid": sessionUuid,
 	})
 }
