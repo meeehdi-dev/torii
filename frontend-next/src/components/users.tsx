@@ -49,6 +49,10 @@ export const Me: FC = async () => {
     },
   );
 
+  if (!me) {
+    return null;
+  }
+
   return (
     <div>
       <hr />
