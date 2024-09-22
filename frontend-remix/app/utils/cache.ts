@@ -27,11 +27,26 @@ client.on("end", () => {
 
 client.connect();
 
-export async function getCache(key: string) {
-  const data = await client.get(key);
+interface CacheOptions {
+  duration: number;
+  uuid: string | null;
+}
+
+const getKey = (key: string, cookie: string | null): string => {
+  return `${key}${cookie ? `_${cookie}` : ""}`;
+};
+
+export async function getCache(key: string, cookie: string | null) {
+  const data = await client.get(getKey(key, cookie));
   return data ? JSON.parse(data).value : undefined;
 }
 
-export function setCache(key: string, value: unknown, duration: number) {
-  client.set(key, JSON.stringify({ value }), { EX: duration });
+export function setCache(
+  key: string,
+  value: unknown,
+  { duration, uuid }: CacheOptions
+) {
+  client.set(getKey(key, uuid), JSON.stringify({ value }), {
+    EX: duration,
+  });
 }

@@ -6,7 +6,8 @@ export async function fetchApi<T>(
 ): Promise<T | undefined> {
   try {
     const cacheKey = `remix_${process.env.API_URL}${input}`;
-    const cached = await getCache(cacheKey);
+    const xUuid = (init?.headers as Headers | undefined)?.get("x-uuid") ?? null;
+    const cached = await getCache(cacheKey, xUuid);
     if (cached) {
       return cached as T;
     }
@@ -22,7 +23,10 @@ export async function fetchApi<T>(
       }
 
       if (init?.cacheDuration) {
-        setCache(cacheKey, data, init.cacheDuration);
+        setCache(cacheKey, data, {
+          duration: init.cacheDuration,
+          uuid: xUuid,
+        });
       }
 
       return data;
