@@ -65,7 +65,6 @@ export async function fetchApi<T>(
             "strict",
           secure: cookieObj.Secure === "true",
         };
-        console.log(cookie);
 
         cookies().set(cookie);
       });
