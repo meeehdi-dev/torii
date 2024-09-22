@@ -1,5 +1,16 @@
-import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
-import { Await, defer, Link, useLoaderData } from "@remix-run/react";
+import type {
+  ActionFunctionArgs,
+  LoaderFunctionArgs,
+  MetaFunction,
+} from "@remix-run/node";
+import {
+  Await,
+  defer,
+  Form,
+  Link,
+  redirect,
+  useLoaderData,
+} from "@remix-run/react";
 import { Suspense } from "react";
 import { Buckets } from "~/components/buckets";
 import { Ping } from "~/components/ping";
@@ -10,6 +21,31 @@ import { fetchApi } from "~/utils/api";
 export const meta: MetaFunction = () => {
   return [{ title: "Torii" }, { name: "description", content: "Okaeri!" }];
 };
+
+export async function action({ request }: ActionFunctionArgs) {
+  const session = await userSession.getSession(request.headers.get("cookie"));
+
+  const formData = await request.formData();
+
+  if (formData.get("action") === "login") {
+    const user = await fetchApi<{ uuid: string }>("/v1/login", {
+      method: "post",
+      body: formData,
+    });
+
+    if (!user) {
+      return;
+    }
+
+    session.set("uuid", user.uuid);
+
+    return redirect("/", {
+      headers: {
+        "Set-Cookie": await userSession.commitSession(session),
+      },
+    });
+  }
+}
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const session = await userSession.getSession(request.headers.get("Cookie"));
@@ -26,9 +62,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
   );
   const me = fetchApi<{ user: { id: number; email: string } }>("/v1/user/me", {
     cacheDuration: 60,
-    headers: {
+    headers: new Headers({
       "x-uuid": uuid ?? "",
-    },
+    }),
   });
   const buckets = fetchApi<{
     buckets: { name: string; creationDate: string }[];
@@ -55,7 +91,7 @@ export default function Index() {
         </Await>
       </Suspense>
       <Suspense fallback="loading me...">
-        <Await resolve={dataPromise.me} errorElement={<div></div>}>
+        <Await resolve={dataPromise.me} errorElement={<></>}>
           {(me) => <Me me={me} />}
         </Await>
       </Suspense>
@@ -64,7 +100,11 @@ export default function Index() {
           {(buckets) => <Buckets buckets={buckets} />}
         </Await>
       </Suspense>
-      <Link to={"/login"}>Login</Link>
+      <Form method="post">
+        <input type="hidden" name="action" value="login" />
+        <input type="email" name="email" />
+        <button type="submit">Se connecter</button>
+      </Form>
     </div>
   );
 }
