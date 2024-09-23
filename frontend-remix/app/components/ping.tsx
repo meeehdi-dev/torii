@@ -5,5 +5,5 @@ interface PingProps {
 }
 
 export const Ping: FC<PingProps> = ({ pong }) => {
-  return <div>ping: {pong}</div>;
+  return <div>ping | {pong}</div>;
 };

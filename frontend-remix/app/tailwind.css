@@ -3,6 +3,13 @@
 @tailwind utilities;
 
 html {
-  background: black;
-  color: white;
+  @apply bg-black text-white;
+}
+
+h1 {
+  @apply text-2xl;
+}
+
+h2 {
+  @apply text-xl;
 }

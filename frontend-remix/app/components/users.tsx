@@ -6,10 +6,9 @@ interface UserProps {
 }
 
 export const User: FC<UserProps> = ({ id, email }) => (
-  <div>
-    <span>ID: {id}</span>
-    <span>, </span>
-    <span>Email: {email}</span>
+  <div className="flex gap-2 font-thin">
+    <span>{email}</span>
+    <span className="font-mono italic text-gray-300">({id})</span>
   </div>
 );
 
@@ -18,10 +17,15 @@ export const Users: FC<{
 }> = ({ users }) => {
   return (
     <div>
-      <hr />
       <h2>Users</h2>
-      {users ? (
-        users.users.map((user) => <User key={user.id} {...user} />)
+      {users && users.users.length > 0 ? (
+        <ul>
+          {users.users.map((user) => (
+            <li key={user.id}>
+              <User {...user} />
+            </li>
+          ))}
+        </ul>
       ) : (
         <div>[]</div>
       )}
@@ -34,10 +38,8 @@ export const Me: FC<{
 }> = ({ me }) => {
   return (
     <div>
-      <hr />
       <h2>Me</h2>
-      {me ? <User {...me.user} /> : <div>null</div>}
-      <hr />
+      <User {...me.user} />
     </div>
   );
 };

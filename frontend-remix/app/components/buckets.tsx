@@ -10,14 +10,18 @@ export const Buckets: FC<{ buckets: { buckets: Bucket[] } }> = ({
 }) => {
   return (
     <div>
-      <hr />
       <h2>Buckets</h2>
-      {buckets ? (
-        buckets.buckets.map((bucket, index) => (
-          <span key={index}>
-            {bucket.name} ({bucket.creationDate})
-          </span>
-        ))
+      {buckets && buckets.buckets.length > 0 ? (
+        <ul className="font-thin">
+          {buckets.buckets.map((bucket, index) => (
+            <li key={index} className="flex gap-2">
+              <span>{bucket.name}</span>
+              <span className="font-mono italic text-gray-300">
+                ({bucket.creationDate})
+              </span>
+            </li>
+          ))}
+        </ul>
       ) : (
         <div>[]</div>
       )}

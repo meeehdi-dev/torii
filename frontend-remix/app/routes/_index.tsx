@@ -3,14 +3,7 @@ import type {
   LoaderFunctionArgs,
   MetaFunction,
 } from "@remix-run/node";
-import {
-  Await,
-  defer,
-  Form,
-  Link,
-  redirect,
-  useLoaderData,
-} from "@remix-run/react";
+import { Await, defer, Form, redirect, useLoaderData } from "@remix-run/react";
 import { Suspense } from "react";
 import { Buckets } from "~/components/buckets";
 import { Ping } from "~/components/ping";
@@ -79,10 +72,24 @@ export default function Index() {
   const dataPromise = useLoaderData<typeof loader>();
 
   return (
-    <div>
+    <main className="flex flex-col gap-8 p-8">
       <Suspense fallback="pinging...">
         <Await resolve={dataPromise.pong}>
           {(pong) => <Ping pong={pong} />}
+        </Await>
+      </Suspense>
+      <Suspense fallback="loading me...">
+        <Await
+          resolve={dataPromise.me}
+          errorElement={
+            <Form method="post">
+              <input type="hidden" name="action" value="login" />
+              <input type="email" name="email" />
+              <button type="submit">Se connecter</button>
+            </Form>
+          }
+        >
+          {(me) => <Me me={me} />}
         </Await>
       </Suspense>
       <Suspense fallback="loading users...">
@@ -90,21 +97,11 @@ export default function Index() {
           {(users) => <Users users={users} />}
         </Await>
       </Suspense>
-      <Suspense fallback="loading me...">
-        <Await resolve={dataPromise.me} errorElement={<></>}>
-          {(me) => <Me me={me} />}
-        </Await>
-      </Suspense>
       <Suspense fallback="loading buckets...">
         <Await resolve={dataPromise.buckets}>
           {(buckets) => <Buckets buckets={buckets} />}
         </Await>
       </Suspense>
-      <Form method="post">
-        <input type="hidden" name="action" value="login" />
-        <input type="email" name="email" />
-        <button type="submit">Se connecter</button>
-      </Form>
-    </div>
+    </main>
   );
 }

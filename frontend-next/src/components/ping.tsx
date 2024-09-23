@@ -6,5 +6,5 @@ export const Ping: FC = async () => {
     next: { revalidate: 10 },
   });
 
-  return <div>ping: {pong}</div>;
+  return <div>ping | {pong}</div>;
 };

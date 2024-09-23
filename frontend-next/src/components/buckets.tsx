@@ -13,14 +13,18 @@ export const Buckets: FC = async () => {
 
   return (
     <div>
-      <hr />
       <h2>Buckets</h2>
-      {buckets ? (
-        buckets.buckets.map((bucket, index) => (
-          <span key={index}>
-            {bucket.name} ({bucket.creationDate})
-          </span>
-        ))
+      {buckets && buckets.buckets.length > 0 ? (
+        <ul>
+          {buckets.buckets.map((bucket, index) => (
+            <li key={index} className="flex gap-2 font-thin">
+              <span>{bucket.name}</span>
+              <span className="font-mono text-gray-300 italic">
+                ({bucket.creationDate})
+              </span>
+            </li>
+          ))}
+        </ul>
       ) : (
         <div>[]</div>
       )}
