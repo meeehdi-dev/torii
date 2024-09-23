@@ -23,6 +23,7 @@ export async function action({ request }: ActionFunctionArgs) {
   const action = formData.get("action");
 
   if (action === "login") {
+    // TODO: use jose to sign with secret
     const user = await fetchApi<{ uuid: string }>("/v1/login", {
       method: "post",
       body: formData,
@@ -40,6 +41,16 @@ export async function action({ request }: ActionFunctionArgs) {
       },
     });
   } else if (action === "logout") {
+    const session = await userSession.getSession(request.headers.get("Cookie"));
+    const uuid = session.get("uuid");
+
+    await fetchApi<{ success: boolean }>("/v1/logout", {
+      method: "post",
+      headers: new Headers({
+        "x-uuid": uuid ?? "",
+      }),
+    });
+
     return redirect("/", {
       headers: {
         "Set-Cookie": await userSession.destroySession(session),

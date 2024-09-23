@@ -12,7 +12,6 @@ import (
 	"github.com/google/uuid"
 )
 
-// TODO: handle expire via backend?
 var expireTime = time.Hour * 24 * 7 // 1 week
 
 func HasSession() gin.HandlerFunc {
@@ -59,5 +58,19 @@ func Login(c *gin.Context) {
 
 	c.JSON(200, gin.H{
 		"uuid": sessionUuid,
+	})
+}
+
+func Logout(c *gin.Context) {
+	uuid := c.GetHeader("x-uuid")
+
+	err := cache.Client.Del(context.Background(), "session_"+uuid).Err()
+	if err != nil {
+		c.JSON(500, gin.H{"success": false})
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"success": true,
 	})
 }

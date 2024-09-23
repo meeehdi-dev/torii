@@ -19,6 +19,7 @@ func Init() *gin.Engine {
 		v1.POST("/login", auth.Login)
 		v1.GET("/users", users.Get)
 		v1.Use(auth.HasSession())
+		v1.POST("/logout", auth.Logout)
 		v1.GET("/user/me", users.GetMe)
 		v1.GET("/user/:id", users.GetOne)
 	}

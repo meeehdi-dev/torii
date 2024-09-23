@@ -69,6 +69,13 @@ export const Me: FC = async () => {
         action={async () => {
           "use server";
 
+          await fetchApi<{ success: boolean }>("/v1/logout", {
+            method: "post",
+            headers: new Headers({
+              "x-uuid": uuid ?? "",
+            }),
+          });
+
           cookies().delete("nextjs_session");
         }}
       >

@@ -26,6 +26,7 @@ export default async function Home() {
                 body: formData,
               });
               if (uuid?.uuid) {
+                // TODO: use jose to sign with secret
                 cookies().set({
                   value: uuid.uuid,
                   name: "nextjs_session",
