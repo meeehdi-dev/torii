@@ -20,7 +20,9 @@ export async function action({ request }: ActionFunctionArgs) {
 
   const formData = await request.formData();
 
-  if (formData.get("action") === "login") {
+  const action = formData.get("action");
+
+  if (action === "login") {
     const user = await fetchApi<{ uuid: string }>("/v1/login", {
       method: "post",
       body: formData,
@@ -35,6 +37,12 @@ export async function action({ request }: ActionFunctionArgs) {
     return redirect("/", {
       headers: {
         "Set-Cookie": await userSession.commitSession(session),
+      },
+    });
+  } else if (action === "logout") {
+    return redirect("/", {
+      headers: {
+        "Set-Cookie": await userSession.destroySession(session),
       },
     });
   }
@@ -82,7 +90,7 @@ export default function Index() {
         <Await
           resolve={dataPromise.me}
           errorElement={
-            <Form method="post">
+            <Form method="post" className="flex gap-4">
               <input type="hidden" name="action" value="login" />
               <input type="email" name="email" />
               <button type="submit">Se connecter</button>

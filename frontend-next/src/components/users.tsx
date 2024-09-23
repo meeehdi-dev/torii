@@ -65,6 +65,15 @@ export const Me: FC = async () => {
     <div>
       <h2>Me</h2>
       <User {...me.user} />
+      <form
+        action={async () => {
+          "use server";
+
+          cookies().delete("nextjs_session");
+        }}
+      >
+        <button type="submit">Se déconnecter</button>
+      </form>
     </div>
   );
 };

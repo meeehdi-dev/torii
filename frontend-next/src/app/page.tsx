@@ -32,6 +32,7 @@ export default async function Home() {
                 });
               }
             }}
+            className="flex gap-4"
           >
             <input type="email" name="email" />
             <button type="submit">Se connecter</button>

@@ -1,3 +1,4 @@
+import { Form } from "@remix-run/react";
 import { FC } from "react";
 
 interface UserProps {
@@ -40,6 +41,10 @@ export const Me: FC<{
     <div>
       <h2>Me</h2>
       <User {...me.user} />
+      <Form method="post">
+        <input type="hidden" name="action" value="logout" />
+        <button type="submit">Se déconnecter</button>
+      </Form>
     </div>
   );
 };
