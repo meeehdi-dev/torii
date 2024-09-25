@@ -41,7 +41,7 @@ export default class RedisCacheHandler {
    * @returns {Promise<import("next/dist/server/lib/incremental-cache").CacheHandlerValue | null>}
    */
   async get(cacheKey) {
-    return client.get(`nextjs_${cacheKey}`);
+    return JSON.parse(await client.get(`nextjs_${cacheKey}`));
   }
 
   /**
@@ -51,29 +51,10 @@ export default class RedisCacheHandler {
    * @return {Promise<void>}
    */
   async set(pathname, data, ctx) {
-    client.set(`nextjs_${pathname}`, {
-      value: data,
-      lastModified: Date.now(),
-      tags: ctx.tags,
-    });
-  }
-
-  /**
-   * @param {string | string[]} tags
-   * @return {Promise<void>}
-   */
-  async revalidateTag(tags) {
-    console.error("tag revalidate not implemented!");
-    if (!Array.isArray(tags)) {
-      tags = [tags];
-    }
-    // for (let tag of tags) {
-    //   const entries = Object.entries(cache);
-    //   for (let [key, value] of entries) {
-    //     if (value.tags.includes(tag)) {
-    //       cache.delete(key);
-    //     }
-    //   }
-    // }
+    return client.set(
+      `nextjs_${pathname}`,
+      JSON.stringify({ value: data, lastModified: Date.now(), tags: ctx.tags }),
+      { EX: ctx.revalidate },
+    );
   }
 }
