@@ -12,7 +12,7 @@ import (
 	"github.com/google/uuid"
 )
 
-var expireTime = time.Hour * 24 * 7 // 1 week
+var expireTime = time.Duration(time.Hour) * 24 * 7 // 1 week
 
 func HasSession() gin.HandlerFunc {
 	return func(c *gin.Context) {
