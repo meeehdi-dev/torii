@@ -1,0 +1,8 @@
+{
+  "watch": [
+    "server.ts",
+    "src/**/*.ts"
+  ],
+  "exec": "bun server.ts",
+  "ext": "ts"
+}
